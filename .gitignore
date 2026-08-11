@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+env/
+
+data/*.csv
+data/*.zip
+
+catboost_info/
+*.log
