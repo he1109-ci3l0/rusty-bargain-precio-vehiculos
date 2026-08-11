@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rusty Bargain — Valuación de vehículos usados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600&family=Raleway:wght@400;500;600&family=Nobile:wght@400;500&family=Zeyada&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{
+  --geyser:#D5DBE7;
+  --dianne:#1A4A4F;
+  --outer:#1E3130;
+  --shark:#1F2224;
+  --menta:#A8D8CC;
+  --rosa:#D4A8B4;
+  --purpura:#9A6A8C;
+  --teal-osc:#3A6878;
+  --blanco:#FFFFFF;
+  --malva:#B08AAE;
+  --teal-prof:#3D7A8A;
+  --gris-morado:#5C5468;
+  --acero:#4A88A4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--shark);
+  color:var(--geyser);
+  font-family:'Bricolage Grotesque',system-ui,sans-serif;
+  font-weight:300;
+  line-height:1.65;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* ---------- eyebrow / labels ---------- */
+.label{
+  font-family:'Raleway',sans-serif;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  font-weight:600;color:var(--menta);
+}
+.num{font-family:'Mona Sans','Nobile',sans-serif;font-variant-numeric:tabular-nums}
+
+/* ---------- hero ---------- */
+header{
+  border-bottom:1px solid var(--outer);
+  padding:96px 0 0;
+  position:relative;overflow:hidden;
+}
+header::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(900px 380px at 78% -8%, rgba(58,104,120,.30), transparent 62%);
+  pointer-events:none;
+}
+.hero-inner{position:relative;z-index:1;padding-bottom:64px}
+h1{
+  font-family:'Philosopher',serif;font-weight:700;
+  font-size:clamp(2.6rem,6.4vw,4.6rem);
+  line-height:1.02;letter-spacing:-.02em;
+  color:var(--blanco);margin:18px 0 0;
+}
+h1 .thin{color:var(--menta);display:block;font-weight:400}
+.dek{
+  max-width:46ch;margin-top:26px;font-size:1.12rem;color:var(--geyser);opacity:.82;
+}
+
+/* ---------- thesis strip ---------- */
+.thesis{
+  margin-top:52px;border-top:1px solid var(--outer);border-bottom:1px solid var(--outer);
+  padding:34px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.crit{padding-right:26px;border-right:1px solid var(--outer)}
+.crit:last-child{border-right:none}
+.crit .who{font-family:'Philosopher',serif;font-size:1.22rem;color:var(--blanco);margin-top:8px}
+.crit .why{font-size:.9rem;opacity:.66;margin-top:6px;line-height:1.5}
+
+/* ---------- sections ---------- */
+section{padding:92px 0;border-bottom:1px solid var(--outer)}
+h2{
+  font-family:'Philosopher',serif;font-weight:700;
+  font-size:clamp(1.75rem,3.4vw,2.5rem);color:var(--blanco);
+  letter-spacing:-.01em;margin:14px 0 0;
+}
+.lede{max-width:62ch;margin-top:18px;opacity:.84}
+
+/* ---------- headline result ---------- */
+.verdict{
+  margin-top:44px;
+  border:1px solid var(--dianne);
+  background:linear-gradient(160deg,rgba(26,74,79,.42),rgba(31,34,36,0) 68%);
+  padding:38px 36px;
+}
+.verdict .model{
+  font-family:'Philosopher',serif;font-size:2.05rem;color:var(--menta);line-height:1.15;
+}
+.verdict .cfg{font-family:'Raleway',sans-serif;font-size:.82rem;letter-spacing:.1em;
+  text-transform:uppercase;opacity:.6;margin-top:8px}
+.deltas{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:34px}
+.delta .k{font-family:'Mona Sans','Nobile',sans-serif;font-variant-numeric:tabular-nums;
+  font-size:2.1rem;color:var(--blanco);line-height:1}
+.delta .k small{font-size:.95rem;opacity:.55;margin-left:4px}
+.delta .v{font-size:.86rem;opacity:.62;margin-top:8px;line-height:1.45}
+
+/* ---------- frontier ---------- */
+.frontier{margin-top:46px}
+figure{margin:0}
+figcaption{font-size:.84rem;opacity:.58;margin-top:16px;max-width:62ch;line-height:1.55}
+svg{width:100%;height:auto;display:block}
+.ax{stroke:var(--gris-morado);stroke-width:1}
+.grid-l{stroke:var(--outer);stroke-width:1}
+.tick{font-family:'Nobile',sans-serif;font-size:11px;fill:var(--geyser);opacity:.5}
+.axtitle{font-family:'Raleway',sans-serif;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;fill:var(--menta);opacity:.8}
+.pt-name{font-family:'Philosopher',serif;font-size:15px;fill:var(--blanco)}
+.pt-name.dom{fill:var(--geyser);opacity:.42}
+.pt-sub{font-family:'Nobile',sans-serif;font-size:11px;fill:var(--geyser);opacity:.45}
+
+/* ---------- table ---------- */
+.tablewrap{margin-top:40px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:660px}
+th{
+  font-family:'Raleway',sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--menta);text-align:right;padding:0 0 14px;
+  border-bottom:1px solid var(--dianne);
+}
+th:first-child{text-align:left}
+td{
+  padding:15px 0;border-bottom:1px solid var(--outer);text-align:right;
+  font-family:'Mona Sans','Nobile',sans-serif;font-variant-numeric:tabular-nums;
+}
+td:first-child{text-align:left;font-family:'Bricolage Grotesque',sans-serif}
+tr.win td{color:var(--menta)}
+tr.win td:first-child{font-weight:600}
+tr.base td{opacity:.5;font-style:italic}
+.badge{
+  font-family:'Raleway',sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--menta);color:var(--menta);padding:2px 7px;margin-left:10px;
+  font-style:normal;white-space:nowrap;
+}
+
+/* ---------- findings ---------- */
+.findings{margin-top:8px}
+.finding{
+  display:grid;grid-template-columns:74px 1fr;gap:28px;
+  padding:34px 0;border-bottom:1px solid var(--outer);
+}
+.finding:last-child{border-bottom:none}
+.finding .idx{
+  font-family:'Mona Sans','Nobile',sans-serif;font-variant-numeric:tabular-nums;
+  font-size:2.5rem;color:var(--dianne);line-height:.9;
+}
+.finding h3{
+  font-family:'Philosopher',serif;font-weight:400;font-size:1.3rem;
+  color:var(--blanco);line-height:1.3;
+}
+.finding p{margin-top:12px;opacity:.76;max-width:64ch}
+.finding .ev{
+  margin-top:14px;font-family:'Mona Sans','Nobile',sans-serif;font-variant-numeric:tabular-nums;
+  font-size:.86rem;color:var(--menta);opacity:.9;
+  border-left:2px solid var(--dianne);padding-left:14px;
+}
+
+/* ---------- scaling bars ---------- */
+.scalebars{margin-top:40px;display:flex;flex-direction:column;gap:2px}
+.sb{display:grid;grid-template-columns:120px 1fr 118px;align-items:center;gap:18px;
+  padding:13px 0;border-bottom:1px solid var(--outer)}
+.sb .nm{font-size:.92rem}
+.sb .track{height:9px;background:var(--outer);position:relative}
+.sb .fill{height:100%;display:block}
+.sb .val{text-align:right;font-family:'Mona Sans','Nobile',sans-serif;
+  font-variant-numeric:tabular-nums;font-size:.86rem;opacity:.8}
+.linear-mark{font-family:'Raleway',sans-serif;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--rosa);opacity:.75;margin-top:14px;display:block}
+
+/* ---------- relative error ---------- */
+.rel{margin-top:40px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px;align-items:end}
+.relcol{text-align:center}
+.relcol .bar{background:var(--purpura);margin:0 auto;width:100%;
+  border-top:2px solid var(--malva)}
+.relcol .pct{font-family:'Mona Sans','Nobile',sans-serif;font-variant-numeric:tabular-nums;
+  font-size:1.02rem;color:var(--blanco);margin-bottom:9px}
+.relcol .rng{font-family:'Nobile',sans-serif;font-size:.72rem;opacity:.55;margin-top:12px;line-height:1.35}
+.relcol.alarm .bar{background:var(--rosa);border-top-color:var(--blanco)}
+.relcol.alarm .pct{color:var(--rosa)}
+
+/* ---------- method ---------- */
+.method{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:40px;
+  background:var(--outer);border:1px solid var(--outer)}
+.mcard{background:var(--shark);padding:28px 26px}
+.mcard h4{font-family:'Philosopher',serif;font-weight:400;font-size:1.08rem;color:var(--menta)}
+.mcard p{font-size:.88rem;opacity:.72;margin-top:9px;line-height:1.55}
+
+/* ---------- caveats ---------- */
+.caveats{margin-top:34px;max-width:70ch}
+.caveats li{list-style:none;padding:16px 0 16px 26px;border-bottom:1px solid var(--outer);
+  position:relative;font-size:.93rem;opacity:.76}
+.caveats li::before{content:"—";position:absolute;left:0;color:var(--rosa);opacity:.7}
+
+/* ---------- links ---------- */
+.links{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:40px;
+  background:var(--outer);border:1px solid var(--outer)}
+.lk{background:var(--shark);padding:26px;text-decoration:none;color:var(--geyser);
+  display:block;transition:background .2s}
+.lk:hover{background:var(--outer)}
+.lk .t{font-family:'Philosopher',serif;font-size:1.1rem;color:var(--menta)}
+.lk .d{font-size:.84rem;opacity:.6;margin-top:6px}
+
+footer{padding:64px 0 86px;text-align:center}
+footer .sig{font-family:'Zeyada',cursive;font-size:2.15rem;color:var(--menta)}
+footer .meta{font-size:.8rem;opacity:.45;margin-top:10px;line-height:1.7}
+
+@media(max-width:820px){
+  .thesis,.deltas,.method,.links{grid-template-columns:1fr}
+  .crit{border-right:none;border-bottom:1px solid var(--outer);padding:0 0 18px;margin-bottom:18px}
+  .crit:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+  .finding{grid-template-columns:1fr;gap:10px}
+  .finding .idx{font-size:1.6rem}
+  .rel{grid-template-columns:1fr;gap:10px}
+  .relcol{display:grid;grid-template-columns:60px 1fr;align-items:center;text-align:left;gap:14px}
+  .relcol .bar{height:22px!important;width:auto}
+  .relcol .pct{margin:0}
+  .relcol .rng{margin:0}
+  .sb{grid-template-columns:1fr;gap:8px}
+  .sb .val{text-align:left}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hero-inner">
+    <span class="label">Sprint 15 · Métodos numéricos · Caso de estudio</span>
+    <h1>Tres criterios<span class="thin">que no se pueden optimizar juntos</span></h1>
+    <p class="dek">Rusty Bargain pidió un modelo rápido de entrenar, rápido de predecir y preciso.
+    Las mediciones muestran que cada uno de esos títulos pertenece a un modelo distinto.</p>
+
+    <div class="thesis">
+      <div class="crit">
+        <span class="label">Mayor calidad</span>
+        <div class="who">LightGBM</div>
+        <div class="why">Y el más lento de todos en predicción por lote: 241.8 ms.</div>
+      </div>
+      <div class="crit">
+        <span class="label">Mayor velocidad por lote</span>
+        <div class="who">CatBoost</div>
+        <div class="why">Y el más lento de entrenar: 41.5 s, casi cuatro veces LightGBM.</div>
+      </div>
+      <div class="crit">
+        <span class="label">Menor tiempo de entrenamiento</span>
+        <div class="who">XGBoost</div>
+        <div class="why">Y el peor de los tres en calidad, con la latencia individual más alta.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <span class="label">Recomendación</span>
+    <h2>Qué se eligió y contra qué se midió</h2>
+    <p class="lede">El rival no es la regresión lineal. Es una tabla de medianas por marca, modelo y
+    antigüedad: lo que un tasador haría sin modelo alguno. Ese es el proceso actual, y es el umbral
+    que cualquier inversión en aprendizaje automático tiene que justificar.</p>
+
+    <div class="verdict">
+      <span class="label">Modelo recomendado</span>
+      <div class="model">LightGBM</div>
+      <div class="cfg">600 árboles · η 0.05 · 127 hojas · categóricas nativas</div>
+
+      <div class="deltas">
+        <div class="delta">
+          <div class="k">1 517<small>€</small></div>
+          <div class="v">RECM sobre el conjunto de prueba, no utilizado hasta la decisión final.</div>
+        </div>
+        <div class="delta">
+          <div class="k">−701<small>€</small></div>
+          <div class="v">Reducción frente a la tabla de referencia de 2 218.66 €, equivalente a 31.6 %.</div>
+        </div>
+        <div class="delta">
+          <div class="k">0.66<small>ms</small></div>
+          <div class="v">Latencia por consulta individual, frente a los 50–200 ms de la red.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">La decisión</span>
+    <h2>Frontera de calidad y velocidad</h2>
+    <p class="lede">Un modelo pertenece a la frontera cuando ningún otro lo supera a la vez en error
+    y en latencia. Los tres que quedan fuera se descartan sin argumentar: existe algo mejor en todo.</p>
+
+    <div class="frontier">
+      <figure>
+        <svg viewBox="0 0 900 520" role="img" aria-label="Gráfico de dispersión de RECM contra latencia de predicción individual. LightGBM y CatBoost forman la frontera.">
+          <!-- grid -->
+          <line class="grid-l" x1="90" y1="80"  x2="850" y2="80"/>
+          <line class="grid-l" x1="90" y1="160" x2="850" y2="160"/>
+          <line class="grid-l" x1="90" y1="240" x2="850" y2="240"/>
+          <line class="grid-l" x1="90" y1="320" x2="850" y2="320"/>
+          <line class="grid-l" x1="90" y1="400" x2="850" y2="400"/>
+
+          <!-- reference threshold -->
+          <line x1="90" y1="60" x2="850" y2="60" stroke="#D4A8B4" stroke-width="1" stroke-dasharray="4 5" opacity=".65"/>
+          <text class="tick" x="96" y="52" fill="#D4A8B4" opacity=".85">Tabla de referencia · 2 219 €</text>
+
+          <!-- axes -->
+          <line class="ax" x1="90" y1="440" x2="850" y2="440"/>
+          <line class="ax" x1="90" y1="40"  x2="90"  y2="440"/>
+
+          <!-- y ticks -->
+          <text class="tick" x="80" y="84"  text-anchor="end">1 950</text>
+          <text class="tick" x="80" y="164" text-anchor="end">1 850</text>
+          <text class="tick" x="80" y="244" text-anchor="end">1 750</text>
+          <text class="tick" x="80" y="324" text-anchor="end">1 650</text>
+          <text class="tick" x="80" y="404" text-anchor="end">1 550</text>
+
+          <!-- x ticks (log) -->
+          <text class="tick" x="150" y="462" text-anchor="middle">0.2 ms</text>
+          <text class="tick" x="330" y="462" text-anchor="middle">0.7 ms</text>
+          <text class="tick" x="560" y="462" text-anchor="middle">5 ms</text>
+          <text class="tick" x="770" y="462" text-anchor="middle">15 ms</text>
+
+          <text class="axtitle" x="470" y="497" text-anchor="middle">Latencia de predicción individual</text>
+          <text class="axtitle" x="26" y="240" text-anchor="middle" transform="rotate(-90 26 240)">RECM en euros</text>
+
+          <!-- pareto line -->
+          <line x1="150" y1="418" x2="330" y2="450" stroke="#A8D8CC" stroke-width="2" stroke-dasharray="6 5" opacity=".55"/>
+
+          <!-- dominated: Arbol -->
+          <circle cx="278" cy="96" r="9" fill="#1F2224" stroke="#5C5468" stroke-width="2"/>
+          <text class="pt-name dom" x="296" y="92">Árbol de decisión</text>
+          <text class="pt-sub" x="296" y="110">1 915.65 € · 0.388 ms · dominado</text>
+
+          <!-- dominated: Bosque -->
+          <circle cx="770" cy="304" r="9" fill="#1F2224" stroke="#5C5468" stroke-width="2"/>
+          <text class="pt-name dom" x="756" y="286" text-anchor="end">Bosque aleatorio</text>
+          <text class="pt-sub" x="756" y="304" text-anchor="end">1 628.43 € · 14.622 ms · dominado</text>
+
+          <!-- dominated: XGBoost -->
+          <circle cx="566" cy="362" r="9" fill="#1F2224" stroke="#5C5468" stroke-width="2"/>
+          <text class="pt-name dom" x="552" y="344" text-anchor="end">XGBoost</text>
+          <text class="pt-sub" x="552" y="362" text-anchor="end">1 556.75 € · 5.376 ms · dominado</text>
+
+          <!-- frontier: CatBoost -->
+          <circle cx="150" cy="418" r="11" fill="#A8D8CC" stroke="#1F2224" stroke-width="2"/>
+          <text class="pt-name" x="170" y="414">CatBoost</text>
+          <text class="pt-sub" x="170" y="432">1 567.63 € · 0.221 ms</text>
+
+          <!-- frontier: LightGBM -->
+          <circle cx="330" cy="450" r="13" fill="#A8D8CC" stroke="#1F2224" stroke-width="2"/>
+          <text class="pt-name" x="352" y="446">LightGBM</text>
+          <text class="pt-sub" x="352" y="464">1 527.02 € · 0.659 ms · recomendado</text>
+        </svg>
+        <figcaption>Eje horizontal en escala logarítmica. Los puntos huecos están dominados: existe al
+        menos un modelo con menor error y menor latencia simultáneamente. La diferencia de 0.44 ms
+        entre los dos modelos de la frontera es menos del 1 % de la latencia de red que la aplicación
+        ya paga, de modo que la elección recae en la calidad.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">Ocho procedimientos</span>
+    <h2>Todas las mediciones</h2>
+    <p class="lede">Validación cruzada de cinco pliegues sobre 245 106 registros. Cronometraje con reloj
+    monótono, mediana de cinco repeticiones, con separación entre entrenamiento, lote y consulta aislada.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>RECM €</th>
+            <th>σ pliegues</th>
+            <th>Entren. s</th>
+            <th>Lote s</th>
+            <th>Latencia ms</th>
+            <th>k</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="win"><td>LightGBM<span class="badge">Recomendado</span></td><td>1 527.02</td><td>19.13</td><td>10.975</td><td>0.242</td><td>0.659</td><td>0.058</td></tr>
+          <tr><td>XGBoost</td><td>1 556.75</td><td>18.98</td><td>7.203</td><td>0.088</td><td>5.376</td><td>0.589</td></tr>
+          <tr><td>CatBoost</td><td>1 567.63</td><td>20.40</td><td>41.538</td><td>0.055</td><td>0.221</td><td>0.782</td></tr>
+          <tr><td>Bosque aleatorio</td><td>1 628.43</td><td>18.22</td><td>8.048</td><td>0.065</td><td>14.622</td><td>1.292</td></tr>
+          <tr><td>Árbol de decisión</td><td>1 915.65</td><td>12.53</td><td>1.521</td><td>0.017</td><td>0.388</td><td>1.184</td></tr>
+          <tr class="base"><td>Tabla de referencia</td><td>2 218.66</td><td>29.55</td><td>0.018</td><td>0.009</td><td>0.925</td><td>—</td></tr>
+          <tr class="base"><td>Regresión lineal</td><td>2 718.05</td><td>37.35</td><td>1.226</td><td>0.022</td><td>0.361</td><td>—</td></tr>
+          <tr class="base"><td>Constante (media)</td><td>4 546.83</td><td>29.94</td><td>0.000</td><td>0.000</td><td>0.005</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Las tres últimas filas son líneas base. La columna k es el exponente empírico de
+    T(n) = c · n<sup>k</sup>, estimado sobre cinco tamaños de muestra.</figcaption>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">Escalamiento</span>
+    <h2>Cuánto cuesta crecer</h2>
+    <p class="lede">El exponente k determina qué pasa cuando el inventario se multiplica. Con k igual a
+    uno, duplicar los datos duplica el tiempo. Por debajo, el costo está dominado por trabajo que no
+    depende del número de registros.</p>
+
+    <div class="scalebars">
+      <div class="sb">
+        <span class="nm">LightGBM</span>
+        <span class="track"><span class="fill" style="width:4.5%;background:#A8D8CC"></span></span>
+        <span class="val">k = 0.058</span>
+      </div>
+      <div class="sb">
+        <span class="nm">XGBoost</span>
+        <span class="track"><span class="fill" style="width:45.6%;background:#B08AAE"></span></span>
+        <span class="val">k = 0.589</span>
+      </div>
+      <div class="sb">
+        <span class="nm">CatBoost</span>
+        <span class="track"><span class="fill" style="width:60.5%;background:#4A88A4"></span></span>
+        <span class="val">k = 0.782</span>
+      </div>
+      <div class="sb">
+        <span class="nm">Árbol de decisión</span>
+        <span class="track"><span class="fill" style="width:91.6%;background:#3A6878"></span></span>
+        <span class="val">k = 1.184</span>
+      </div>
+      <div class="sb">
+        <span class="nm">Bosque aleatorio</span>
+        <span class="track"><span class="fill" style="width:100%;background:#D4A8B4"></span></span>
+        <span class="val">k = 1.292</span>
+      </div>
+    </div>
+    <span class="linear-mark">Escalamiento lineal, k = 1, cae en el 77 % de la barra</span>
+
+    <figcaption style="margin-top:26px">Extrapolado a diez millones de registros, el reentrenamiento de
+    LightGBM pasaría de 10.9 a 13.1 segundos; el del bosque aleatorio, a 22 minutos. Hoy ambos cuestan
+    prácticamente lo mismo. La extrapolación cubre un factor de 41 sobre el rango medido y es
+    orientación de magnitud, no predicción.</figcaption>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">Lo que la métrica esconde</span>
+    <h2>Error relativo por rango de precio</h2>
+    <p class="lede">La RECM trata igual un fallo de 500 € en un coche de 800 y en uno de 30 000. Medido
+    en proporción del precio, el modelo recomendado falla justo donde el error absoluto era menor.</p>
+
+    <div class="rel">
+      <div class="relcol alarm">
+        <div class="pct">166.8 %</div>
+        <div class="bar" style="height:200px"></div>
+        <div class="rng">100 – 999 €<br>16 684 registros</div>
+      </div>
+      <div class="relcol">
+        <div class="pct">55.2 %</div>
+        <div class="bar" style="height:66px"></div>
+        <div class="rng">1 000 – 2 499 €<br>19 757 registros</div>
+      </div>
+      <div class="relcol">
+        <div class="pct">35.5 %</div>
+        <div class="bar" style="height:43px"></div>
+        <div class="rng">2 500 – 4 999 €<br>18 012 registros</div>
+      </div>
+      <div class="relcol">
+        <div class="pct">23.5 %</div>
+        <div class="bar" style="height:28px"></div>
+        <div class="rng">5 000 – 9 999 €<br>16 479 registros</div>
+      </div>
+      <div class="relcol">
+        <div class="pct">19.0 %</div>
+        <div class="bar" style="height:23px"></div>
+        <div class="rng">10 000 – 20 000 €<br>10 770 registros</div>
+      </div>
+    </div>
+
+    <figcaption style="margin-top:28px">En el rango inferior, que agrupa el 20.4 % del conjunto de
+    prueba, el modelo predice en promedio más del doble del valor real. El error cuadrático medio
+    penaliza el cuadrado de la desviación, así que concentra la capacidad del modelo en el extremo
+    superior. La recomendación operativa es no mostrar valuación puntual por debajo de un umbral, o
+    mostrar un rango en su lugar.</figcaption>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">Hallazgos</span>
+    <h2>Seis cosas que las mediciones revelaron</h2>
+
+    <div class="findings">
+      <div class="finding">
+        <span class="idx num">01</span>
+        <div>
+          <h3>El rival verdadero no es la regresión lineal</h3>
+          <p>Una tabla de medianas por marca, modelo y antigüedad supera al modelo lineal por 499 €. El
+          precio de un vehículo no es aditivo en sus características: la potencia no vale lo mismo en un
+          utilitario que en un deportivo. La agrupación captura esas interacciones de forma implícita;
+          la suma ponderada no puede representarlas.</p>
+          <div class="ev">Tabla de referencia 2 218.66 € · Regresión lineal 2 718.05 € · σ 30 y 37 €</div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="idx num">02</span>
+        <div>
+          <h3>La latencia individual no se deduce del tiempo por lote</h3>
+          <p>Predecir un registro aislado paga costos fijos que se amortizan en el lote: validación de
+          entrada, conversión a la estructura interna, reparto entre núcleos. El bosque aleatorio es el
+          caso extremo — distribuir treinta árboles entre núcleos cuesta más que el propio cálculo
+          cuando la entrada es una sola fila.</p>
+          <div class="ev">Sobrecosto de 133× en LightGBM · 2 992× en XGBoost · 11 040× en el bosque</div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="idx num">03</span>
+        <div>
+          <h3>LightGBM apenas escala con el número de registros</h3>
+          <p>El método de histogramas discretiza cada característica en 255 contenedores fijos y busca
+          los cortes sobre los contenedores, no sobre los registros. Con 600 árboles y 127 hojas, ese
+          trabajo domina el costo y no depende del tamaño del conjunto.</p>
+          <div class="ev">De 9.38 a 10.87 s mientras n se multiplica por diez · k = 0.058 · R² = 0.89</div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="idx num">04</span>
+        <div>
+          <h3>Expandir columnas abarata la búsqueda de cortes</h3>
+          <p>XGBoost procesa 314 columnas indicadoras y entrena más rápido que LightGBM sobre 12
+          columnas nativas. Una columna binaria admite un único punto de corte; una categórica de 250
+          niveles admite muchos más. La expansión encarece la memoria y abarata la búsqueda.</p>
+          <div class="ev">Factor de expansión 26.2× en columnas · 6.5× en memoria · razón de tiempo 0.66</div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="idx num">05</span>
+        <div>
+          <h3>La ausencia era señal, no ruido</h3>
+          <p>Los anuncios que omiten la potencia tienen mediana de 1 300 € contra 3 200 € de los que la
+          declaran. Imputar sin marcar dónde estaba el hueco habría borrado un discriminante que separa
+          el precio por un factor de casi tres.</p>
+          <div class="ev">40 225 ceros en Power · 37 352 en RegistrationMonth · marcados con indicador binario</div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="idx num">06</span>
+        <div>
+          <h3>Casi todo el ajuste de hiperparámetros fue innecesario</h3>
+          <p>De la configuración más barata a la más cara de LightGBM, la RECM mejora 122 € mientras el
+          tiempo se multiplica por 64. Las cuatro últimas configuraciones caben en once euros: son
+          equivalentes bajo la regla fijada antes de ver resultados, y la más barata cuesta la cuarta
+          parte.</p>
+          <div class="ev">Regla: si Δ RECM &lt; σ entre pliegues, los modelos son equivalentes y decide la velocidad</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">Protocolo</span>
+    <h2>Cómo se decidió</h2>
+    <p class="lede">Las reglas se fijaron antes de ver resultados. Decidir el criterio después de conocer
+    los números permite acomodarlo al modelo que uno prefiere.</p>
+
+    <div class="method">
+      <div class="mcard">
+        <h4>Tres líneas base, no una</h4>
+        <p>Constante, tabla de referencia por grupo y regresión lineal. La segunda representa el proceso
+        actual y es el umbral que todo modelo debe superar; la tercera es la prueba de cordura exigida
+        por el encargo.</p>
+      </div>
+      <div class="mcard">
+        <h4>Regla de equivalencia declarada de antemano</h4>
+        <p>Si la diferencia de RECM entre dos modelos es menor que la desviación entre pliegues del
+        mejor, se declaran equivalentes y decide la velocidad. Entre equivalentes en ambas, gana el más
+        simple.</p>
+      </div>
+      <div class="mcard">
+        <h4>Lista de verificación de fuga</h4>
+        <p>Cuatro columnas excluidas por describir el proceso de publicación y no el vehículo. La más
+        peligrosa era LastSeen: la distancia hasta DateCreated mide cuánto duró el anuncio, y eso es
+        posterior al hecho que se predice.</p>
+      </div>
+      <div class="mcard">
+        <h4>Diagnóstico antes de ajustar</h4>
+        <p>Error de entrenamiento alto significa que falta capacidad; bajo con validación mala significa
+        que sobra. El árbol sin podar arrojó una brecha de 1 667 €; LightGBM por defecto, de 92 €. Las
+        direcciones de ajuste eran opuestas.</p>
+      </div>
+      <div class="mcard">
+        <h4>Índices compartidos entre representaciones</h4>
+        <p>Las particiones se generaron una sola vez y se aplicaron a las dos codificaciones. Partir por
+        separado, aun con la misma semilla, habría dejado a los modelos compitiendo sobre conjuntos de
+        prueba distintos.</p>
+      </div>
+      <div class="mcard">
+        <h4>El conjunto de prueba se tocó una vez</h4>
+        <p>Todo el ajuste ocurrió con validación cruzada sobre entrenamiento. La prueba se usó
+        únicamente para la cifra final: 1 517.36 € contra 1 527.02 € de validación, diferencia contenida
+        en el ruido.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">Salvedades</span>
+    <h2>Lo que estas cifras no dicen</h2>
+    <ul class="caveats">
+      <li>Las cifras absolutas de RECM son una estimación optimista. Se conservaron 27 543 registros
+      coincidentes en características y precio por considerarse señal de mercado, y ejemplares
+      equivalentes pueden quedar repartidos entre particiones. El efecto opera por igual sobre todos los
+      modelos y no altera el orden relativo.</li>
+      <li>Las particiones son aleatorias, no temporales. El conjunto abarca dos meses de captura de 2016
+      y no permite evaluar la degradación del modelo con el paso del tiempo.</li>
+      <li>Los tiempos absolutos dependen del equipo y de la paralelización activa. Las razones entre
+      modelos son transferibles; los segundos no.</li>
+      <li>El precio está truncado en 20 000 €. Las conclusiones no se extienden por encima de esa cifra.</li>
+      <li>El código postal se descartó por su cardinalidad de unos ocho mil valores. Su aprovechamiento
+      correcto exigiría agregación regional o codificación por objetivo calculada dentro de cada pliegue.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="label">Recursos</span>
+    <h2>Repositorio y materiales</h2>
+
+    <div class="links">
+      <a class="lk" href="https://github.com/he1109-ci3l0/rusty-bargain-precio-vehiculos">
+        <div class="t">Repositorio</div>
+        <div class="d">Código, notebook completo y entorno reproducible</div>
+      </a>
+      <a class="lk" href="https://github.com/he1109-ci3l0/rusty-bargain-precio-vehiculos/blob/master/notebooks/rusty_bargain.ipynb">
+        <div class="t">Notebook</div>
+        <div class="d">Análisis en dieciocho secciones, con anexos de acotaciones y erratas</div>
+      </a>
+      <a class="lk" href="https://github.com/he1109-ci3l0/rusty-bargain-precio-vehiculos/blob/master/environment.yml">
+        <div class="t">Entorno</div>
+        <div class="d">conda · rusty-bargain · Python 3.11</div>
+      </a>
+      <a class="lk" href="https://github.com/he1109-ci3l0/rusty-bargain-precio-vehiculos/tree/master/src">
+        <div class="t">Código modular</div>
+        <div class="d">Funciones de preparación, evaluación y cronometraje</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="sig">Belem Cisneros Díaz</div>
+    <div class="meta">
+      Sprint 15 · Métodos numéricos · Bootcamp de Data Science, TripleTen<br>
+      Datos: car_data.csv · 354 369 registros · Métrica oficial: RECM sobre Price
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
