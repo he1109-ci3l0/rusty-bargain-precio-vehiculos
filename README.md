@@ -12,7 +12,9 @@ tres criterios simultáneos de interés: **calidad de la predicción, velocidad 
 de entrenamiento**. El trabajo demuestra que los tres no admiten optimización conjunta y construye la
 frontera de alternativas defendibles.
 
----
+## Pregunta de negocio
+
+¿Cómo estimar el valor de mercado de un auto usado con menos error que la tabla de precios que usa hoy el servicio, sin perder velocidad de respuesta en la app ni hacer lento el reentrenamiento?
 
 ## Resultado
 
@@ -26,9 +28,7 @@ frontera de alternativas defendibles.
 | **Tiempo de entrenamiento** | 10.975 s |
 | **Exponente de escalamiento** | k = 0.058 |
 
----
-
-## Comparación completa
+### Comparación completa
 
 | Modelo | RECM (€) | σ pliegues | Entren. (s) | Lote (s) | Latencia (ms) | k |
 |---|---:|---:|---:|---:|---:|---:|
@@ -43,7 +43,12 @@ frontera de alternativas defendibles.
 
 Validación cruzada de 5 pliegues sobre 245 106 registros de entrenamiento. Las líneas base van en cursiva.
 
----
+## Lo que gana la empresa
+
+- **Precios más cercanos al mercado.** El modelo recomendado reduce el error de valuación en **701.30 € por vehículo (31.6 %)** frente a la tabla de referencia que se usa hoy, lo que ayuda a no publicar autos por debajo de su valor ni tan caros que no se vendan.
+- **Respuesta inmediata en la app.** Una valuación individual tarda **0.659 milisegundos**, así que el usuario recibe el precio estimado sin espera.
+- **Reentrenar es barato.** El modelo se entrena en unos 11 segundos y casi no se vuelve más lento con más datos (k = 0.058): a diez millones de registros la extrapolación da unos 13 segundos, contra 22 minutos del bosque aleatorio.
+- **La decisión queda documentada.** La frontera de alternativas muestra qué se gana y qué se pierde con cada modelo, para que el negocio elija según su prioridad (calidad o velocidad).
 
 ## Hallazgos
 
@@ -74,26 +79,7 @@ indicadoras y entrena más rápido que LightGBM sobre 12 columnas nativas. Una c
 rango de 100 a 999 €, que agrupa el 20.4 % del conjunto de prueba. El error cuadrático medio penaliza
 el cuadrado de la desviación y concentra la capacidad del modelo en el extremo superior.
 
----
-
-## Estructura
-
-```
-proyecto_15MetodosNumericos/
-├── data/                  car_data.csv (no versionado, 41 MB)
-├── notebooks/
-│   ├── rusty_bargain.ipynb        análisis completo, 18 secciones
-│   └── plantilla_tripleten.ipynb  plantilla original, referencia
-├── src/                   funciones reutilizables
-├── figures/               gráficas exportadas
-├── docs/                  sitio del caso de estudio
-├── environment.yml
-└── README.md
-```
-
----
-
-## Metodología
+## Cómo está hecho
 
 Ocho secciones de análisis con protocolo declarado antes de ver resultados.
 
@@ -109,9 +95,22 @@ Ocho secciones de análisis con protocolo declarado antes de ver resultados.
   entrenamiento, predicción por lote y latencia individual.
 - **Escalamiento empírico** — ajuste de T(n) = c · n^k sobre 5 tamaños de muestra, con R² reportado.
 
----
+### Estructura
 
-## Reproducción
+```
+rusty-bargain-precio-vehiculos/
+├── data/                  car_data.csv (no versionado, 41 MB)
+├── notebooks/
+│   ├── rusty_bargain.ipynb        análisis completo, 18 secciones
+│   └── notebook.ipynb             plantilla original de TripleTen, referencia
+├── src/                   funciones reutilizables
+├── figures/               gráficas exportadas
+├── docs/                  sitio del caso de estudio
+├── environment.yml
+└── README.md
+```
+
+### Reproducción
 
 ```bash
 conda env create -f environment.yml
@@ -122,8 +121,6 @@ python -m ipykernel install --user --name rusty-bargain --display-name "Python (
 Coloca `car_data.csv` en `data/` y ejecuta el notebook completo desde `notebooks/`.
 
 Semilla fija: `RANDOM_STATE = 12345`.
-
----
 
 ## Salvedades
 
@@ -138,5 +135,6 @@ Las particiones son aleatorias, no temporales. El conjunto abarca dos meses de c
 
 ---
 
-*Proyecto desarrollado como parte del bootcamp de Data Science de TripleTen. Sprint 15 — Métodos
-numéricos. Métrica oficial: RECM sobre `Price`.*
+*Proyecto desarrollado como parte del bootcamp de Data Science de TripleTen (Sprint 15 — Métodos numéricos). Métrica oficial: RECM (raíz del error cuadrático medio) sobre `Price`.*
+
+**Belem Cisneros Díaz** · [LinkedIn](https://www.linkedin.com/in/belemcisneros) · [github.com/he1109-ci3l0](https://github.com/he1109-ci3l0)
